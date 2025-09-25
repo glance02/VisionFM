@@ -1,14 +1,14 @@
-# VisionFM: A Vision Foundation Model for Generalist Ophthalmic Artificial Intelligence
+# VisionFM：用于通用眼科人工智能的视觉基础模型
 
-The official implementation of VisionFM - a multimodal multitask vision foundation model, pre-trained using 3.4 million ophthalmic images from over 0.5 million subjects to enable generalist ophthalmic artificial intelligence. VisionFM is able to process eight common ophthalmic imaging modalities including fundus photography, optical coherence tomography (OCT), fundus fluorescein angiography (FFA), slit lamp, B-scan ultrasound, external eye imaging, MRI, and ultrasound biomicroscopy (UBM), and can be applied to solve various ophthalmic AI tasks such as ocular disease recognition, disease progression prediction, segmetation and detection of disease phenotypes and anatomical landmarks, as well as systemic biomarker and disease prediction. Functionality of VisionFM can be further extended beyond the current tasks by self-supervised pre-training of new imaging modalities and supervised fine-tuning of new clinical tasks, with the potential of addressing diverse, global ophthalmic diseases and different clinical challenges.  
+VisionFM 官方实现 - 一个 multimodal multitask vision foundation model，使用来自超过 50 万受试者的 340 万张眼科图像进行预训练，以实现通用眼科人工智能。VisionFM 能够处理八种常见的眼科成像模式，包括眼底摄影、光学相干断层扫描 (OCT)、眼底荧光血管造影 (FFA)、裂隙灯、B 型超声、外眼成像、MRI 和超声生物显微镜 (UBM)，并可应用于解决各种眼科 AI 任务，如眼部疾病识别、疾病进展预测、疾病表型和解剖标志的分割和检测，以及全身生物标志物和疾病预测。VisionFM 的功能可以通过新成像模式的自监督预训练和新临床任务的监督微调进一步扩展，有可能解决各种全球眼科疾病和不同的临床挑战。
 
-## Latest News
+## 最新消息
 
-- [2024/11] :tada: Congrats! VisionFM has been published in [NEJM AI](https://ai.nejm.org/doi/full/10.1056/AIoa2300221).
-- [2024/05] The fine-tuning code has been released, along with fine-tuned weights on eight public multiclass disease recognition datasets
+- [2024/11] :tada: 恭喜！VisionFM 已在 [NEJM AI](https://ai.nejm.org/doi/full/10.1056/AIoa2300221) 上发表。
+- [2024/05] 微调代码已发布，同时发布了在八个公共多类疾病识别数据集上的微调权重
 
-## Citation
-If you find this repository useful, please consider citing this paper:
+## 引用
+如果您认为这个仓库有用，请考虑引用这篇论文：
 ```text
 @article{qiu2024development,
   title={Development and validation of a multimodal multitask vision foundation model for generalist ophthalmic artificial intelligence},
@@ -22,31 +22,31 @@ If you find this repository useful, please consider citing this paper:
 }
 ```
 
-## 0. Install environment
+## 0. 安装环境
 
-Create the environment with conda commands:
+使用 conda 命令创建环境：
 ```shell
 conda create -n vfm python=3.8
 conda activate vfm
 ```
 
-Install the dependencies:
+安装依赖：
 ```shell
 git clone https://github.com/ABILab-CUHK/VisionFM.git
 cd VisionFM
 pip install -r requirements.txt
 ```
-## 1. Finetuning
-If you want to utlize our weights to fine-tune on your data, please refer to this [instruction](./Fine-tuning/README.md).
+## 1. 微调
+如果您想利用我们的权重在您的数据上进行微调，请参考此 [说明](./Fine-tuning/README.md)。
 
-## 2. Pretraining
-In this step, you can pretrain your own VisionFM encoders on your data. Please follow the instructions below to start pretraining. 
+## 2. 预训练
+在此步骤中，您可以在自己的数据上预训练自己的 VisionFM 编码器。请按照以下说明开始预训练。
 
-### 2.1. Preparing the pretraining dataset
+### 2.1. 准备预训练数据集
 
-In our study, we used `8` modalities: `Fundus, OCT, External Eye, UBM, B-Ultrasound, MRI, Silt Lamp, and FFA`.
-For each modality, e.g. Fundus, its data path should be `/xxx/Fundus/`, which contains all the Fundus images
- with the same or different suffix:
+在我们的研究中，我们使用了 `8` 种模式：`Fundus, OCT, External Eye, UBM, B-Ultrasound, MRI, Silt Lamp, and FFA`。
+对于每种模式，例如 Fundus，其数据路径应为 `/xxx/Fundus/`，其中包含所有 Fundus 图像
+具有相同或不同的后缀：
 
 ```
 .
@@ -62,18 +62,18 @@ For each modality, e.g. Fundus, its data path should be `/xxx/Fundus/`, which co
  
 ```
 
-you can run the following command to generate random images if you do not have fundus photographs at hand:
+如果您手头没有眼底照片，可以运行以下命令生成随机图像：
 ```shell
 cd evaluation
 python random_data.py --task pretrain --dst_dir ../dataset/pretrain_random
 ```
 
-### 2.2. Pretraining the VisionFM encoders
+### 2.2. 预训练 VisionFM 编码器
 
-1. Train `vit-base` on the modality `Fundus`:
+1. 在 `Fundus` 模式上训练 `vit-base`：
 
 ```shell
-# run the following commands to train the Fundus encoder
+# 运行以下命令来训练 Fundus 编码器
 CUDA_VISIBLE_DEVICES=0,1,2,3 nohup python3 -m torch.distributed.launch --nnodes 1 --node_rank 0 --nproc_per_node=4 --master_addr=127.0.0.1 --master_port=29500 main_pretrain.py \
 --local-rank=0 \
 --data_path ./dataset/pretrain_random \
@@ -90,19 +90,19 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 nohup python3 -m torch.distributed.launch --nnodes 
 --name Train_Random_Fundus \
 --load_pretrain > train_fundus.log 2>&1 &
 # or 
-bash train_vitb_fundus.sh # contain the same command
+bash train_vitb_fundus.sh # 包含相同的命令
 
-# Attention: the defaualt batch size is 128, batch_size=12 is only for debugging.
+# 注意：默认的 batch size 是 128，batch_size=12 仅用于调试。
 ```
 
-By changing modalities, different VisionFM encoders can be trained.
+通过更改模式，可以训练不同的 VisionFM 编码器。
 
-## 3. Training decoders for downstream tasks
+## 3. 为下游任务训练解码器
 
-### 3.1. Download the pretrained weights of VisionFM
-Please download the corresponding model weight based on the modality that you want to carry out research.
+### 3.1. 下载 VisionFM 的预训练权重
+请根据您想要进行研究的模式下载相应的模型权重。
 
-| Modality   | Google Drive                                                                                      |
+| 模式   | Google Drive                                                                                      |
 |------------|---------------------------------------------------------------------------------------------------|
 | Fundus     | [Download](https://drive.google.com/file/d/13uWm0a02dCWyARUcrCdHZIcEgRfBmVA4/view?usp=sharing) |
 | OCT        | [Download](https://drive.google.com/file/d/1o6E-ine2QLx2pxap-c77u-SU0FjxwypA/view?usp=sharing) |
@@ -114,16 +114,16 @@ Please download the corresponding model weight based on the modality that you wa
 | UBM        | [Download](https://drive.google.com/file/d/1q2fVOgFBnWNu1BsXaza1A-OIcCiifNUQ/view?usp=sharing) |
 
 
-### 3.2. Training a classification decoder [Multi-modality]
+### 3.2.训练分类解码器 [多模态]
 
-The `Multi-modality` means the decoder is trained on different modalities simultaneously. Considering the existence of different encoders (each modality has its own encoder),
-we adopt a two-stage pipeline: `pre-extracting features from VisionFM encoders of different modalities` and `training the decoder using the aggregated image features`:
+`多模态` 意味着解码器是在不同模态上同时训练的。考虑到不同编码器的存在（每种模态都有自己的编码器），
+我们采用两阶段流水线：`从不同模态的 VisionFM 编码器中预提取特征` 和 `使用聚合的图像特征训练解码器`：
 
-For the first step, we need to extract image features based on their modalities. For example, we can extract the Fundus and OCT features through Fundus and OCT encoders respectively.
-Then, for the second step, we can start training the decoder using the combined features extracted from these two modalities.
+对于第一步，我们需要根据模态提取图像特征。例如，我们可以通过 Fundus 和 OCT 编码器分别提取 Fundus 和 OCT 特征。
+然后，对于第二步，我们可以开始使用从这两种模态中提取的组合特征来训练解码器。
 
-#### 3.2.1. Preparing the dataset
-Please organize your dataset into the following directory structure (we call this directory structure style as `vfm`):
+#### 3.2.1. 准备数据集
+请将您的数据集组织成以下目录结构（我们称这种目录结构样式为 `vfm`）：
 ```
 .
 ├── /XXX/FundusClassification/
@@ -155,35 +155,35 @@ Please organize your dataset into the following directory structure (we call thi
 ...
 ```
 
-The corresponding `training_labels.txt` and `test_labels.txt` are organized as follows as an example:
+相应的 `training_labels.txt` 和 `test_labels.txt` 组织如下作为示例：
 ```
-# class list: ['Healthy', 'DR-1', 'DR-2', 'DR-3', 'DR-4', 'DR', 'Glaucoma', 'AMD', 'Cataract', 'Hypertensive Retinopathy', 'Retinal Vein Occlusion', 'Myopia', 'Retinal Detachment']
-# in training_labels.txt
-# Attention: The labels are suggested to use a multilabel style (not one-hot) to facilitate recognition on an image labelled with multiple diseases and also simplify the use of graded and non-graded data.
+# 类别列表: ['Healthy', 'DR-1', 'DR-2', 'DR-3', 'DR-4', 'DR', 'Glaucoma', 'AMD', 'Cataract', 'Hypertensive Retinopathy', 'Retinal Vein Occlusion', 'Myopia', 'Retinal Detachment']
+# 在 training_labels.txt 中
+# 注意: 建议使用多标签样式（非 one-hot）来标记，以方便识别标记有多种疾病的图像，同时简化分级和非分级数据的使用。
 training/1.jpg;0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0
 training/2.jpg;0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0
 ```
 
-You can download our preprocessed public [dataset](https://drive.google.com/file/d/1QShoYrkhZetF41vmFuf6ds3I1W05YONk/view?usp=drive_link) (containing IDRiD and OCTID datasets) to start the training. 
-After unzipping the downloaded dataset, please organize the dataset using the following structure:
+您可以下载我们预处理的公共 [数据集](https://drive.google.com/file/d/1QShoYrkhZetF41vmFuf6ds3I1W05YONk/view?usp=drive_link)（包含 IDRiD 和 OCTID 数据集）来开始训练。
+解压下载的数据集后，请使用以下结构组织数据集：
 ```text
 ./dataset/ProcessedDatasets/MultiModalCls/IDRiD
 ./dataset/ProcessedDatasets/MultiModalCls/OCTID
 ```
 
-Or you can generate random dataset using the following command:
+或者您可以使用以下命令生成随机数据集：
 ```shell
 python evaluation/random_data.py --task multi_cls --dst_dir ./dataset/multi_cls_random
 ```
 
-#### 3.2.2.  Feature extraction
-The following command extracts image features using the pretrained VisionFM encoders:
+#### 3.2.2. 特征提取
+以下命令使用预训练的 VisionFM 编码器提取图像特征：
 
 ```shell
 #cd evaluation
-#extract the Fundus and OCT features through Fundus and OCT encoders respectively
+#分别通过 Fundus 和 OCT 编码器提取 Fundus 和 OCT 特征
 #CUDA_VISIBLE_DEVICES=0 nohup python evaluation/extract_features.py \
-# extract Fundus features
+# 提取 Fundus 特征
 CUDA_VISIBLE_DEVICES=1,2 nohup python3 -m torch.distributed.launch --nnodes 1 --node_rank 0 --nproc_per_node=2 --master_port=29503 evaluation/extract_features.py \
 --pretrained_weights ./pretrain_weights/VFM_Fundus_weights.pth \
 --batch_size_per_gpu 768 \
@@ -191,7 +191,7 @@ CUDA_VISIBLE_DEVICES=1,2 nohup python3 -m torch.distributed.launch --nnodes 1 --
 --modality Fundus \
 --dst_root ./dataset/multi_cls_random/FunClsFeat/ > extract_feats.log 2>&1 &
 
-# extract OCT features
+# 提取 OCT 特征
 CUDA_VISIBLE_DEVICES=1,2 nohup python3 -m torch.distributed.launch --nnodes 1 --node_rank 0 --nproc_per_node=2 --master_port=29503 evaluation/extract_features.py \
 --pretrained_weights ./pretrain_weights/VFM_OCT_weights.pth \
 --batch_size_per_gpu 768 \
@@ -199,16 +199,16 @@ CUDA_VISIBLE_DEVICES=1,2 nohup python3 -m torch.distributed.launch --nnodes 1 --
 --modality OCT \
 --dst_root ./dataset/multi_cls_random/OCTClsFeat/ > extract_feats.log 2>&1 &
 
-# for the provided preprocessed datasets, you should set the following param:
+# 对于提供的预处理数据集，您应该设置以下参数：
 --data_path ./dataset/ProcessedDatasets/MultiModalCls/FundusClassificationMulti/
 --dst_root ./dataset/ProcessedDatasets/MultiModalCls/FunClsFeat/
-# or
+# 或者
 --data_path ./dataset/ProcessedDatasets/MultiModalCls/OCTClassificationMulti/
 --dst_root ./dataset/ProcessedDatasets/MultiModalCls/OCTClsFeat/
 ```
 
-#### 3.2.3. Training a decoder based on extracted multimodal features
-Then, train the classification decoder by the following command:
+#### 3.2.3. 基于提取的多模态特征训练解码器
+然后，通过以下命令训练分类解码器：
 ```shell
 #cd evaluation
 CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29501 evaluation/train_cls_multi_decoder.py \
@@ -219,15 +219,15 @@ CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_nod
 --batch_size_per_gpu 8192 > train_cls_multi.log 2>&1 &
 ```
 
-### 3.3. Training a classification decoder [Single-modality]
+### 3.3. 训练分类解码器 [单模态]
 
-This task mainly focuses on single modality, such as Fundus based DR grading task.
+此任务主要关注单模态，例如基于 Fundus 的 DR 分级任务。
 
-#### 3.3.1. Preparing the dataset
-Please organize your dataset into the following directory structure (we call this directory structure style as `vfm`):
+#### 3.3.1. 准备数据集
+请将您的数据集组织成以下目录结构（我们称这种目录结构样式为 `vfm`）：
 ```
 .
-├── /XXX/FundusClassification/ # all dataset should be the same task with same class definition
+├── /XXX/FundusClassification/ # 所有数据集应为同一任务，具有相同的类别定义
 │   ├── dataset_A/
 │   │   ├── training/
 │   │   │   ├── 1.png
@@ -256,28 +256,28 @@ Please organize your dataset into the following directory structure (we call thi
 ...
 ```
 
-The `training_labels.txt` and `test_labels.txt` contains the image path and its corresponding labels:
+`training_labels.txt` 和 `test_labels.txt` 包含图像路径及其对应的标签：
 ```text
-# in training_labels.txt
+# 在 training_labels.txt 中
 training/1.jpg;1
 training/2.jpg;2
 ```
 
-You can download our preprocessed [dataset](https://drive.google.com/file/d/1QShoYrkhZetF41vmFuf6ds3I1W05YONk/view?usp=drive_link) (containing the processed IDRiD and OCTID to start the training. 
-After unzipping the downloaded dataset, you should organize the dataset using the following structure:
+您可以下载我们预处理的 [数据集](https://drive.google.com/file/d/1QShoYrkhZetF41vmFuf6ds3I1W05YONk/view?usp=drive_link)（包含处理后的 IDRiD 和 OCTID 以开始训练。
+解压下载的数据集后，您应该使用以下结构组织数据集：
 ```text
 ./dataset/ProcessedDatasets/SingleModalCls/FundusClassification/IDRiD 
 ./dataset/ProcessedDatasets/SingleModalCls/OCTClassification/OCTID
 ```
 
-Or you can generate random dataset by using the following command:
+或者您可以使用以下命令生成随机数据集：
 ```shell
-python evaluation/random_data.py --task single_cls --dst_dir ./dataset/single_cls_random # for DR grading task
+python evaluation/random_data.py --task single_cls --dst_dir ./dataset/single_cls_random # 用于 DR 分级任务
 ```
 
-Except for the mentioned directory structure (called vfm), you can also use the following directory structure (ImageNet format):
+除了提到的目录结构（称为 vfm），您还可以使用以下目录结构（ImageNet 格式）：
 ```test
-├── data folder
+├── 数据文件夹
     ├──train
         ├──class_a
         ├──class_b
@@ -291,11 +291,11 @@ Except for the mentioned directory structure (called vfm), you can also use the 
         ├──class_b
         ├──class_c
 ```
-If your datasets are organized as this structure, please set `--dataset_format ImageNet`.
+如果您的数据集以此结构组织，请设置 `--dataset_format ImageNet`。
 
 
-#### 3.3.2. Training the decoder
-Then, train the decoder for the classification task by the following command:
+#### 3.3.2. 训练解码器
+然后，通过以下命令为分类任务训练解码器：
 ```shell
 CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29501 evaluation/train_cls_decoder.py \
 --name single_cls_debug \
@@ -305,9 +305,9 @@ CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_nod
 --num_labels 5 \
 --batch_size_per_gpu 32 > train_single_cls.log 2>&1 &
 
-#Attention: set --num_labels 1 for the binary classification task
+#注意：对于二分类任务，请设置 --num_labels 1
 
-# for processed dataset: Fundus based DR grading
+# 对于处理后的数据集：基于 Fundus 的 DR 分级
 CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29501 evaluation/train_cls_decoder.py \
 --name single_cls_debug \
 --pretrained_weights ./pretrain_weights/VFM_Fundus_weights.pth \
@@ -316,7 +316,7 @@ CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_nod
 --num_labels 5 \
 --batch_size_per_gpu 32 > train_single_cls.log 2>&1 &
 
-# for dataset with ImageNet format: Fundus based DR grading
+# 对于 ImageNet 格式的数据集：基于 Fundus 的 DR 分级
 CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29501 evaluation/train_cls_decoder.py \
 --name single_cls_debug \
 --dataset_format ImageNet \
@@ -326,7 +326,7 @@ CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_nod
 --num_labels 5 \
 --batch_size_per_gpu 32 > train_single_cls.log 2>&1 &
 
-# for processed dataset: OCT based binary classification (Health, DR)
+# 对于处理后的数据集：基于 OCT 的二分类（Health, DR）
 CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29501 evaluation/train_cls_decoder.py \
 --name single_cls_debug \
 --pretrained_weights ./pretrain_weights/VFM_OCT_weights.pth \
@@ -336,7 +336,7 @@ CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_nod
 --modality OCT \
 --batch_size_per_gpu 32 > train_single_cls.log 2>&1 &
 
-# after the training of decoder is completed, you can use the following command to evaluate the trained decoder
+# 在解码器训练完成后，您可以使用以下命令评估训练好的解码器
 CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29501 evaluation/train_cls_decoder.py \
 --name single_cls_debug \
 --pretrained_weights ./pretrain_weights/VFM_Fundus_weights.pth \
@@ -348,18 +348,18 @@ CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_nod
 --batch_size_per_gpu 32 > train_single_cls.log 2>&1 &
 
 
-# you can also load the RETFound weights by adding two additional params:
+# 您也可以通过添加两个额外参数来加载 RETFound 权重：
 --arch vit_large \
 --checkpoint_key model \
 ```
 
-### 3.4. Training a segmentation decoder [Single-modality]
-In segmentation task, we train different decoders for different tasks and modalities.
+### 3.4.训练分割解码器 [单模态]
+在分割任务中，我们为不同的任务和模态训练不同的解码器。
 
-#### 3.4.1. Preparing the dataset
-Please organize your dataset into the following directory structure (we call this directory structure style as `vfm`):
+#### 3.4.1. 准备数据集
+请将您的数据集组织成以下目录结构（我们称这种目录结构样式为 `vfm`）：
 ```
-├── /dst_dir/VesselSegmentation/ # all dataset should be the same task, e.g., fundus vessel segmentation
+├── /dst_dir/VesselSegmentation/ # 所有数据集应为同一任务，例如，眼底血管分割
 │   ├── dataset_A/
 │   │   ├── training/
 │   │   │   ├── images/
@@ -374,20 +374,20 @@ Please organize your dataset into the following directory structure (we call thi
 │   │   └── ...
 │   └── ...
 └── ...
-The range of pixel values in images in the labels directory should be [0, C-1], where C is the number of classes. 
+labels 目录中图像的像素值范围应为 [0, C-1]，其中 C 是类别数。
 ```
-You can download our preprocessed public [dataset](https://drive.google.com/file/d/1QShoYrkhZetF41vmFuf6ds3I1W05YONk/view?usp=drive_link) (contain DRIVE dataset for vessel segmetnation) to start the training. 
-After unzipping the downloaded dataset, please organize the dataset as the following structure:
+您可以下载我们预处理的公共 [数据集](https://drive.google.com/file/d/1QShoYrkhZetF41vmFuf6ds3I1W05YONk/view?usp=drive_link)（包含 DRIVE 数据集用于血管分割）来开始训练。
+解压下载的数据集后，请将数据集组织成以下结构：
 ```text
 ./dataset/ProcessedDatasets/SingleModalSeg/VesselSegmentation/DRIVE 
 ```
-Or you can generate a random dataset by using the following command:
+或者您可以使用以下命令生成随机数据集：
 ```shell
 python evaluation/random_data.py --task segmentation --dst_dir ./dataset/seg_random
 ```
 
-#### 3.4.2. Training the decoder
-Then, train the decoder for the segmentation task by the following command:
+#### 3.4.2. 训练解码器
+然后，通过以下命令为分割任务训练解码器：
 ```shell
 CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29509 evaluation/train_seg_decoder.py \
 --name single_seg_debug \
@@ -399,7 +399,7 @@ CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_nod
 --data_path ./dataset/seg_random/VesselSegmentation/ \
 --batch_size_per_gpu 5 > train_seg.log 2>&1 &
 
-# for the provided preprocessed datasets, you should set the following param:
+# 对于提供的预处理数据集，您应该设置以下参数：
 CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29509 evaluation/train_seg_decoder.py \
 --name single_seg_debug \
 --pretrained_weights ./pretrain_weights/VFM_Fundus_weights.pth \
@@ -412,19 +412,19 @@ CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_nod
 ```
 
 
-### 3.5. Training a landmark detection decoder [Single-modality]
-In this task, we train a decoder to detect the anterior chamber angle (ACA) landmarks on UBM images. 
+### 3.5. 训练地标检测解码器 [单模态]
+在此任务中，我们训练一个解码器来检测 UBM 图像上的前房角 (ACA) 地标。
 
-#### 3.5.1. Preparing the dataset
-Please organize the dataset into the same directory structure as that of segmentation tasks (the suffix of labels should be .npy).
+#### 3.5.1. 准备数据集
+请将数据集组织成与分割任务相同的目录结构（标签的后缀应为 .npy）。
 
-Or you can generate a random dataset by using the following command:
+或者您可以使用以下命令生成随机数据集：
 ```shell
 python evaluation/random_data.py --task landmark --dst_dir ./dataset/landmark_random
 ```
 
-#### 3.5.2. Training the decoder
-Then, train the decoder for the landmark detection task by using the following command:
+#### 3.5.2. 训练解码器
+然后，使用以下命令为地标检测任务训练解码器：
 ```shell
 CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29508 evaluation/train_landmark_decoder.py \
 --name train_landmark \
@@ -434,11 +434,11 @@ CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nproc_per_nod
 --batch_size_per_gpu 32  > train_landmark.log 2>&1 &
 ```
 
-### 3.6. Training a biomarker prediction decoder [Multi-modality]
-In our experiments, we train the decoder on Fundus and External images to predict biomarker prediction. 
+### 3.6. 训练生物标志物预测解码器 [多模态]
+在我们的实验中，我们在 Fundus 和 External 图像上训练解码器以预测生物标志物。
 
-#### 3.6.1. Preparing the dataset
-Please organize the dataset into the following directory structure (we call this directory structure style as `vfm`), which is the same as classification task:
+#### 3.6.1. 准备数据集
+请将数据集组织成以下目录结构（我们称这种目录结构样式为 `vfm`），这与分类任务相同：
 ```
 .
 ├── /XXX/FundusRegression/
@@ -469,20 +469,20 @@ Please organize the dataset into the following directory structure (we call this
 │   └── ....
 ...
 ```
-The corresponding `training_labels.txt` and `test_labels.txt` are organized as follows (38 values):
+相应的 `training_labels.txt` 和 `test_labels.txt` 组织如下（38 个值）：
 ```
-# in training_labels.txt
+# 在 training_labels.txt 中
 training/1.jpg;38.8,2.5,37.0,11.4,8.9,0.05,0.4,0.13,1.1,46.6,157.0,3.87,31.3,32.8,337.0,..., 3.4,4.13,0.93,2.62,3.17
 ```
-Or you can generate random dataset by using the following command:
+或者您可以使用以下命令生成随机数据集：
 ```shell
 python evaluation/random_data.py --task metric_reg --dst_dir ./dataset/metric_random
 ```
 
-#### 3.6.2. Extracting features
-First, extract the image features using the following commands:
+#### 3.6.2. 提取特征
+首先，使用以下命令提取图像特征：
 ```shell
-# extract the features for Fundus images
+# 提取 Fundus 图像的特征
 CUDA_VISIBLE_DEVICES=0,1 nohup python3 -m torch.distributed.launch --nproc_per_node=2 --master_port=29503 evaluation/extract_features.py \
 --pretrained_weights ./pretrain_weights/VFM_Fundus_weights.pth \
 --batch_size_per_gpu 768 \
@@ -490,7 +490,7 @@ CUDA_VISIBLE_DEVICES=0,1 nohup python3 -m torch.distributed.launch --nproc_per_n
 --modality Fundus \
 --dst_root ./dataset/metric_random/FunRegFeat/ > extract_feats.log 2>&1
 
-#extract the features for External images
+#提取 External 图像的特征
 CUDA_VISIBLE_DEVICES=0,1 nohup python3 -m torch.distributed.launch --nproc_per_node=2 --master_port=29503 evaluation/extract_features.py \
 --pretrained_weights ./pretrain_weights/VFM_External_weights.pth \
 --batch_size_per_gpu 768 \
@@ -499,8 +499,8 @@ CUDA_VISIBLE_DEVICES=0,1 nohup python3 -m torch.distributed.launch --nproc_per_n
 --dst_root ./dataset/metric_random/ExternalRegFeat/ > extract_feats.log 2>&1
 ```
 
-#### 3.6.3. Training the decoder using extracted features
-Then, train the biomarker prediction decoder using the following command:
+#### 3.6.3. 使用提取的特征训练解码器
+然后，使用以下命令训练生物标志物预测解码器：
 ```shell
 CUDA_VISIBLE_DEVICES=0,1 nohup python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29504 evaluation/train_metric_reg_multi_decoder.py  \
 --name train_metric_reg_multi \
@@ -512,10 +512,10 @@ CUDA_VISIBLE_DEVICES=0,1 nohup python3 -m torch.distributed.launch --nproc_per_n
 ```
 
 
-### 3.7. Training a glaucoma progression forecasting decoder [Single-modality]
+### 3.7. 训练青光眼进展预测解码器 [单模态]
 
-#### 3.7.1 Preparing the data
-Please organize the data into the following structure:
+#### 3.7.1 准备数据
+请将数据组织成以下结构：
 ```
 
 ├── /dataset/glaucoma_forecasting/
@@ -529,27 +529,26 @@ Please organize the data into the following structure:
 │   └── test_labels.txt
 
 ```
-The corresponding `training_labels.txt` and `test_labels.txt` are organized as follows (path/to/image, label, time interval):
+相应的 `training_labels.txt` 和 `test_labels.txt` 组织如下 (path/to/image, label, time interval)：
 ```
-# in training_labels.txt
+# 在 training_labels.txt 中
 ./dataset/glaucoma_forecasting/training/1.jpg, 0, 309
-# in test_labels.txt
+# 在 test_labels.txt 中
 ./dataset/glaucoma_forecasting/test/1.jpg, 0, 690
 ```
 
 
-#### 3.7.2 Training the decoder
-The glaucoma forecasting decoder can be trained using the following command:
+#### 3.7.2 训练解码器
+青光眼预测解码器可以使用以下命令进行训练：
 
 ```shell
 CUDA_VISIBLE_DEVICES=0,1 python -m torch.distributed.launch evaluation/train_forecasting_decoder.py  --data_path ./dataset/glaucoma_forecasting/ --pretrained_weights /path/to/checkpoint.pth --n_last_blocks 4 --avgpool_patchtokens 1 --input_size 224 --checkpoint_key teacher --output_dir ./results/glaucoma_forecasting --num_labels 2 --lr 0.001 --batch_size_per_gpu 128 --epochs 100
 ```
 
 
-## 4. VisionFM private evaluation data and synthetic images
+## 4. VisionFM 私有评估数据和合成图像
 
-Synthetic images and a subset of our private evaluation data can be accessed. Please download [the data request and agreement form](resource/visionfm_dataset_agreement_form.pdf), sign and email it to visionfm-datasets@googlegroups.com
+可以访问合成图像和我们私有评估数据的一个子集。请下载 [数据请求和协议表](resource/visionfm_dataset_agreement_form.pdf)，签名后发送至 visionfm-datasets@googlegroups.com
 
-## LICENSE
-This project is released under a license that permits use for research and educational purposes only. Commercial use of this model is not allowed. Please ensure that you comply with the terms of this license when using the model. For more information, refer to the LICENSE file included in this repository.
-
+## 许可证
+本项目根据仅允许用于研究和教育目的的许可证发布。该模型的商业使用是不允许的。使用该模型时，请确保遵守此许可证的条款。有关更多信息，请参阅本仓库中包含的 LICENSE 文件。

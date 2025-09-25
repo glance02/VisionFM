@@ -325,15 +325,15 @@ def metric_reg(args):
 
 def parse_args():
     parser = argparse.ArgumentParser('Generate the random image data')
-    # Add an argument for the task to be performed
+    # 为要执行的任务添加参数
     parser.add_argument('--task', type=str, default='pretrain', choices=['pretrain', 'multi_cls','segmentation', 'single_cls','landmark', 'metric_reg'], help='generate toy data for a type of task')
-    # Add an argument for the destination directory to save the generated images
+    # 为保存生成图像的目标目录添加参数
     parser.add_argument('--dst_dir', type=str, default='./', help='save dir for the generated images')
-    # Add an argument for the number of generated images
+    # 添加生成图像数量的参数
     parser.add_argument('--num', type=int, default=500, help='the number of the generated images')
-    # Add an argument for the image size of the generated images
+    # 为生成图像的图像大小添加参数
     parser.add_argument('--img_size', type=int, default=512, help='the image size of generate images')
-    # Parse the arguments
+    # 解析参数
     args = parser.parse_args()
     # Return the arguments
     return args
