@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES=2,3,4,5 nohup python3 -m torch.distributed.launch --nnodes 1 --node_rank 0 --nproc_per_node=4 --master_addr=127.0.0.1 --master_port=29500 main_pretrain.py \
+CUDA_VISIBLE_DEVICES=0 nohup python3 -m torch.distributed.launch --nnodes 1 --node_rank 0 --nproc_per_node=1 --master_addr=127.0.0.1 --master_port=29500 main_pretrain.py \
 --data_path ./dataset/pretrain_random \
 --modality Fundus \
 --norm_last_layer true \
